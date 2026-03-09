@@ -142,17 +142,18 @@ bool RedkinaAIntegralSimpsonOMP::RunImpl() {
   double total_sum = 0.0;
   int n0 = n_[0];
 
-  const auto &a_ref = a_;
-  const auto &h_ref = h;
-  const auto &n_ref = n_;
-  const auto &func_ref = func_;
-  size_t dim_val = dim;
-  int n0_val = n0;
+  // Локальные копии для использования в OpenMP (избегаем работы с членами класса)
+  const auto a_local = a_;
+  const auto h_local = h;
+  const auto n_local = n_;
+  const auto &func_local = func_;
+  const size_t dim_local = dim;
+  const int n0_local = n0;
 
-#pragma omp parallel for reduction(+ : total_sum) schedule(static) default(none) \
-    shared(a_ref, h_ref, n_ref, func_ref, dim_val, n0_val) num_threads(ppc::util::GetNumThreads())
-  for (int i0 = 0; i0 <= n0_val; ++i0) {
-    total_sum += ProcessSubspace(a_ref, h_ref, n_ref, i0, func_ref, dim_val);
+#pragma omp parallel for reduction(+ : total_sum) default(none) \
+    shared(a_local, h_local, n_local, func_local, dim_local, n0_local)
+  for (int i0 = 0; i0 <= n0_local; ++i0) {
+    total_sum += ProcessSubspace(a_local, h_local, n_local, i0, func_local, dim_local);
   }
 
   double denominator = 1.0;
