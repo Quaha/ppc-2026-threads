@@ -33,10 +33,10 @@ class LukinIRunFuncTestsThreads : public ppc::util::BaseRunFuncTests<InType, Out
       for (int i = 0; i < count; i++) {
         input_data_[i] = 128;  // однотонное изображение
       }
-    }
-
-    for (int i = 0; i < count; i++) {
-      input_data_[i] = 80 + (i % 81);  // [80,160] - как на обычных фото
+    } else {
+      for (int i = 0; i < count; i++) {
+        input_data_[i] = 80 + (i % 81);  // [80,160] - как на обычных фото
+      }
     }
   }
 
@@ -46,6 +46,9 @@ class LukinIRunFuncTestsThreads : public ppc::util::BaseRunFuncTests<InType, Out
 
     unsigned char min = *min_it;
     unsigned char max = *max_it;
+    if (max == min) {
+      return true;
+    }
 
     float scale = 255.0F / static_cast<float>(max - min);
 
