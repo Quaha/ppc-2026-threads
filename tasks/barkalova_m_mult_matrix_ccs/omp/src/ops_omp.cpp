@@ -116,7 +116,9 @@ bool IsNonZero(const Complex &val) {
 }  // namespace
 
 bool BarkalovaMMultMatrixCcsOMP::RunImpl() {
-  const auto &[a, b] = GetInput();
+  const auto &input = GetInput();
+  const auto &a = input.first;
+  const auto &b = input.second;
 
   try {
     CCSMatrix at;
