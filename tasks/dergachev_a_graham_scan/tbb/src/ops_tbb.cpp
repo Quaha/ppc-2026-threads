@@ -1,6 +1,5 @@
 #include "dergachev_a_graham_scan/tbb/include/ops_tbb.hpp"
 
-#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <utility>
@@ -30,35 +29,24 @@ double DistSquared(const Pt &a, const Pt &b) {
 
 const double kPi = std::acos(-1.0);
 
-bool IsLowerLeft(const Pt &a, const Pt &b) {
-  return a.second < b.second || (a.second == b.second && a.first < b.first);
-}
-
 int FindPivotIndex(const std::vector<Pt> &pts, int n) {
   return tbb::parallel_reduce(tbb::blocked_range<int>(1, n), 0,
-                              [&](const tbb::blocked_range<int> &range, int best) -> int {
+                              [&pts](const tbb::blocked_range<int> &range, int best) -> int {
     for (int i = range.begin(); i < range.end(); ++i) {
-      if (IsLowerLeft(pts[static_cast<std::size_t>(i)], pts[static_cast<std::size_t>(best)])) {
+      auto ui = static_cast<std::size_t>(i);
+      auto ub = static_cast<std::size_t>(best);
+      if (pts[ui].second < pts[ub].second || (pts[ui].second == pts[ub].second && pts[ui].first < pts[ub].first)) {
         best = i;
       }
     }
     return best;
-  }, [&](int a, int b) -> int {
-    return IsLowerLeft(pts[static_cast<std::size_t>(a)], pts[static_cast<std::size_t>(b)]) ? a : b;
-  });
-}
-
-void SortByAngle(std::vector<Pt> &pts) {
-  Pt pivot = pts[0];
-  tbb::parallel_sort(pts.begin() + 1, pts.end(), [&pivot](const Pt &a, const Pt &b) {
-    double cross = CrossProduct(pivot, a, b);
-    if (cross > 0.0) {
-      return true;
+  }, [&pts](int a, int b) -> int {
+    auto ua = static_cast<std::size_t>(a);
+    auto ub = static_cast<std::size_t>(b);
+    if (pts[ua].second < pts[ub].second || (pts[ua].second == pts[ub].second && pts[ua].first < pts[ub].first)) {
+      return a;
     }
-    if (cross < 0.0) {
-      return false;
-    }
-    return DistSquared(pivot, a) < DistSquared(pivot, b);
+    return b;
   });
 }
 
@@ -96,17 +84,22 @@ bool DergachevAGrahamScanTBB::RunImpl() {
   std::vector<Pt> pts(points_.begin(), points_.end());
   int n = static_cast<int>(pts.size());
 
-  if (n <= 1 || std::all_of(pts.begin() + 1, pts.end(),
-                            [&](const Pt &pt) { return pt.first == pts[0].first && pt.second == pts[0].second; })) {
-    if (!pts.empty()) {
-      hull_.push_back(pts[0]);
-    }
+  if (n <= 1) {
+    hull_.assign(pts.begin(), pts.end());
     return true;
   }
 
   int pivot_idx = FindPivotIndex(pts, n);
   std::swap(pts[0], pts[static_cast<std::size_t>(pivot_idx)]);
-  SortByAngle(pts);
+
+  Pt pivot = pts[0];
+  tbb::parallel_sort(pts.begin() + 1, pts.end(), [&pivot](const Pt &a, const Pt &b) {
+    double cross = CrossProduct(pivot, a, b);
+    if (cross != 0.0) {
+      return cross > 0.0;
+    }
+    return DistSquared(pivot, a) < DistSquared(pivot, b);
+  });
 
   for (const auto &p : pts) {
     while (hull_.size() > 1 && CrossProduct(hull_[hull_.size() - 2], hull_.back(), p) <= 0.0) {
