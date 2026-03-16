@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <cstddef>
+#include <functional>
 #include <vector>
 
 #include "oneapi/tbb/blocked_range.h"
