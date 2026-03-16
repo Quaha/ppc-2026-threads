@@ -4,7 +4,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <vector>
@@ -20,6 +19,22 @@ constexpr int kKernelSum = 16;
 
 using KernelRow = std::array<int, kKernelSize>;
 constexpr std::array<KernelRow, kKernelSize> kKernel = {{{1, 2, 1}, {2, 4, 2}, {1, 2, 1}}};
+
+static uint8_t CalculatePixel(const uint8_t *in, int py, int px, int w, int h, int ch) {
+  int sum = 0;
+  for (int ky = -1; ky <= 1; ++ky) {
+    for (int kx = -1; kx <= 1; ++kx) {
+      int ny = std::max(0, std::min(h - 1, py + ky));
+      int nx = std::max(0, std::min(w - 1, px + kx));
+
+      size_t idx = (((static_cast<size_t>(ny) * static_cast<size_t>(w)) + static_cast<size_t>(nx)) * 3) +
+                   static_cast<size_t>(ch);
+
+      sum += static_cast<int>(in[idx]) * kKernel.at(static_cast<size_t>(ky + 1)).at(static_cast<size_t>(kx + 1));
+    }
+  }
+  return static_cast<uint8_t>(sum / kKernelSum);
+}
 }  // namespace
 
 BuzulukskiDGausGorizontalOMP::BuzulukskiDGausGorizontalOMP(const InType &in) : BaseTask() {
@@ -40,7 +55,7 @@ bool BuzulukskiDGausGorizontalOMP::PreProcessingImpl() {
     return false;
   }
 
-  const auto total_size = static_cast<std::size_t>(width_) * static_cast<std::size_t>(height_) * kChannels;
+  const auto total_size = (static_cast<std::size_t>(width_) * static_cast<std::size_t>(height_) * kChannels);
   input_image_.assign(total_size, static_cast<uint8_t>(100));
   output_image_.assign(total_size, 0);
   return true;
@@ -61,33 +76,9 @@ bool BuzulukskiDGausGorizontalOMP::RunImpl() {
   for (int py = 0; py < h; ++py) {
     for (int px = 0; px < w; ++px) {
       for (int ch = 0; ch < 3; ++ch) {
-        int sum = 0;
-        for (int ky = -1; ky <= 1; ++ky) {
-          for (int kx = -1; kx <= 1; ++kx) {
-            int ny = py + ky;
-            int nx = px + kx;
-
-            if (ny < 0) {
-              ny = 0;
-            }
-            if (ny >= h) {
-              ny = h - 1;
-            }
-            if (nx < 0) {
-              nx = 0;
-            }
-            if (nx >= w) {
-              nx = w - 1;
-            }
-
-            const size_t idx = ((static_cast<size_t>(ny) * static_cast<size_t>(w)) + static_cast<size_t>(nx)) * 3 +
-                               static_cast<size_t>(ch);
-            sum += static_cast<int>(in_ptr[idx]) * kKernel[ky + 1][kx + 1];
-          }
-        }
-        const size_t out_idx = ((static_cast<size_t>(py) * static_cast<size_t>(w)) + static_cast<size_t>(px)) * 3 +
-                               static_cast<size_t>(ch);
-        out_ptr[out_idx] = static_cast<uint8_t>(sum / kKernelSum);
+        size_t out_idx = ((((static_cast<size_t>(py) * static_cast<size_t>(w)) + static_cast<size_t>(px)) * 3) +
+                          static_cast<size_t>(ch));
+        out_ptr[out_idx] = CalculatePixel(in_ptr, py, px, w, h, ch);
       }
     }
   }
