@@ -54,7 +54,6 @@ void SortHulls(std::vector<std::vector<Point>> &hulls) {
   });
 }
 
-// Вспомогательные функции для создания данных
 InType CreateEmptyImage(int width, int height) {
   InType img;
   img.width = width;
@@ -121,106 +120,82 @@ class EgorovaLFuncTest : public ppc::util::BaseRunFuncTests<InType, OutType, Tes
   OutType expected_result_;
 };
 
-// Параметры тестов для OMP
-static const std::array<TestType, 8> kOMPTestParams = {{
-    // 1. Один квадрат
-    std::make_tuple(
-        []() {
-          auto img = CreateEmptyImage(10, 10);
-          DrawRectangle(img, 1, 1, 3, 3);
-          return img;
-        }(),
-        std::vector<std::vector<Point>>{GetRectangleHull(1, 1, 3, 3)},
-        "single_square"),
+static const std::array<TestType, 8> kOMPTestParams = {
+    {std::make_tuple(
+         []() {
+  auto img = CreateEmptyImage(10, 10);
+  DrawRectangle(img, 1, 1, 3, 3);
+  return img;
+}(), std::vector<std::vector<Point>>{GetRectangleHull(1, 1, 3, 3)}, "single_square"),
 
-    // 2. Два отдельных квадрата
-    std::make_tuple(
-        []() {
-          auto img = CreateEmptyImage(20, 20);
-          DrawRectangle(img, 2, 2, 4, 4);
-          DrawRectangle(img, 10, 10, 12, 12);
-          return img;
-        }(),
-        std::vector<std::vector<Point>>{GetRectangleHull(2, 2, 4, 4), GetRectangleHull(10, 10, 12, 12)},
-        "two_squares"),
+     std::make_tuple(
+         []() {
+  auto img = CreateEmptyImage(20, 20);
+  DrawRectangle(img, 2, 2, 4, 4);
+  DrawRectangle(img, 10, 10, 12, 12);
+  return img;
+}(), std::vector<std::vector<Point>>{GetRectangleHull(2, 2, 4, 4), GetRectangleHull(10, 10, 12, 12)}, "two_squares"),
 
-    // 3. Прямоугольник (не квадрат)
-    std::make_tuple(
-        []() {
-          auto img = CreateEmptyImage(15, 15);
-          DrawRectangle(img, 2, 3, 6, 5);
-          return img;
-        }(),
-        std::vector<std::vector<Point>>{GetRectangleHull(2, 3, 6, 5)},
-        "rectangle"),
+     std::make_tuple(
+         []() {
+  auto img = CreateEmptyImage(15, 15);
+  DrawRectangle(img, 2, 3, 6, 5);
+  return img;
+}(), std::vector<std::vector<Point>>{GetRectangleHull(2, 3, 6, 5)}, "rectangle"),
 
-    // 4. Три компоненты
-    std::make_tuple(
-        []() {
-          auto img = CreateEmptyImage(30, 30);
-          DrawRectangle(img, 1, 1, 3, 3);
-          DrawRectangle(img, 10, 10, 12, 12);
-          DrawRectangle(img, 20, 5, 22, 7);
-          return img;
-        }(),
-        std::vector<std::vector<Point>>{GetRectangleHull(1, 1, 3, 3), GetRectangleHull(10, 10, 12, 12),
+     std::make_tuple(
+         []() {
+  auto img = CreateEmptyImage(30, 30);
+  DrawRectangle(img, 1, 1, 3, 3);
+  DrawRectangle(img, 10, 10, 12, 12);
+  DrawRectangle(img, 20, 5, 22, 7);
+  return img;
+}(),
+         std::vector<std::vector<Point>>{GetRectangleHull(1, 1, 3, 3), GetRectangleHull(10, 10, 12, 12),
                                          GetRectangleHull(20, 5, 22, 7)},
-        "three_components"),
+         "three_components"),
 
-    // 5. Пустое изображение
-    std::make_tuple(CreateEmptyImage(10, 10), std::vector<std::vector<Point>>{}, "empty_image"),
+     std::make_tuple(CreateEmptyImage(10, 10), std::vector<std::vector<Point>>{}, "empty_image"),
 
-    // 6. Горизонтальная линия
-    std::make_tuple(
-        []() {
-          auto img = CreateEmptyImage(10, 10);
-          for (int col = 2; col <= 5; ++col) {
-            const size_t index = (static_cast<size_t>(5) * static_cast<size_t>(10)) + static_cast<size_t>(col);
-            img.data[index] = 255;
-          }
-          return img;
-        }(),
-        std::vector<std::vector<Point>>{GetLineHull(2, 5, 5, 5)},
-        "horizontal_line"),
+     std::make_tuple(
+         []() {
+  auto img = CreateEmptyImage(10, 10);
+  for (int col = 2; col <= 5; ++col) {
+    const size_t index = (static_cast<size_t>(5) * static_cast<size_t>(10)) + static_cast<size_t>(col);
+    img.data[index] = 255;
+  }
+  return img;
+}(), std::vector<std::vector<Point>>{GetLineHull(2, 5, 5, 5)}, "horizontal_line"),
 
-    // 7. Вертикальная линия
-    std::make_tuple(
-        []() {
-          auto img = CreateEmptyImage(10, 10);
-          for (int row = 2; row <= 5; ++row) {
-            const size_t index = (static_cast<size_t>(row) * static_cast<size_t>(10)) + static_cast<size_t>(5);
-            img.data[index] = 255;
-          }
-          return img;
-        }(),
-        std::vector<std::vector<Point>>{GetLineHull(5, 2, 5, 5)},
-        "vertical_line"),
+     std::make_tuple(
+         []() {
+  auto img = CreateEmptyImage(10, 10);
+  for (int row = 2; row <= 5; ++row) {
+    const size_t index = (static_cast<size_t>(row) * static_cast<size_t>(10)) + static_cast<size_t>(5);
+    img.data[index] = 255;
+  }
+  return img;
+}(), std::vector<std::vector<Point>>{GetLineHull(5, 2, 5, 5)}, "vertical_line"),
 
-    // 8. Сложная форма (буква "L")
-    std::make_tuple(
-        []() {
-          auto img = CreateEmptyImage(10, 10);
-          // Горизонтальная часть
-          for (int col = 2; col <= 5; ++col) {
-            const size_t index = (static_cast<size_t>(2) * static_cast<size_t>(10)) + static_cast<size_t>(col);
-            img.data[index] = 255;
-          }
-          // Вертикальная часть
-          for (int row = 2; row <= 5; ++row) {
-            const size_t index = (static_cast<size_t>(row) * static_cast<size_t>(10)) + static_cast<size_t>(2);
-            img.data[index] = 255;
-          }
-          return img;
-        }(),
-        std::vector<std::vector<Point>>{{{2, 2}, {5, 2}, {2, 5}}},
-        "l_shape")
-}};
+     std::make_tuple([]() {
+  auto img = CreateEmptyImage(10, 10);
+  for (int col = 2; col <= 5; ++col) {
+    const size_t index = (static_cast<size_t>(2) * static_cast<size_t>(10)) + static_cast<size_t>(col);
+    img.data[index] = 255;
+  }
+  for (int row = 2; row <= 5; ++row) {
+    const size_t index = (static_cast<size_t>(row) * static_cast<size_t>(10)) + static_cast<size_t>(2);
+    img.data[index] = 255;
+  }
+  return img;
+}(), std::vector<std::vector<Point>>{{{2, 2}, {5, 2}, {2, 5}}}, "l_shape")}};
 
-// Регистрация тестов для OMP
+namespace {
 INSTANTIATE_TEST_SUITE_P(BinaryConvexHullTestsOMP, EgorovaLFuncTest,
                          ppc::util::ExpandToValues(std::tuple_cat(ppc::util::AddFuncTask<BinaryConvexHullOMP, InType>(
                              kOMPTestParams, PPC_SETTINGS_egorova_l_binary_convex_hull))),
                          EgorovaLFuncTest::PrintFuncTestName<EgorovaLFuncTest>);
+}  // namespace
 
 TEST_P(EgorovaLFuncTest, RunFunctionalTests) {
   ExecuteTest(GetParam());
