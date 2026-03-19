@@ -23,7 +23,7 @@ double DistSq(const Point &a, const Point &b) {
 }
 
 size_t FindMinPointIndexTBB(const std::vector<Point> &points) {
-  return tbb::parallel_reduce(tbb::blocked_range<size_t>(1, points.size()), size_t(0),
+  return tbb::parallel_reduce(tbb::blocked_range<size_t>(1, points.size()), static_cast<size_t>(0),
                               [&points](const tbb::blocked_range<size_t> &r, size_t local_min) {
     for (size_t i = r.begin(); i != r.end(); ++i) {
       if (points[i].y < points[local_min].y - 1e-9 ||
