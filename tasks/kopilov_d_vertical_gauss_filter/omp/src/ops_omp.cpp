@@ -70,21 +70,21 @@ bool KopilovDVerticalGaussFilterOMP::RunImpl() {
     for (int vertical_band = 0; vertical_band < height; ++vertical_band) {
       int sum = 0;
 
-      sum += kGaussKernel[0][0] *
-             KopilovDGetPixelMirrorOmp(matrix, horizontal_band - 1, vertical_band - 1, width, height);
+      sum +=
+          kGaussKernel[0][0] * KopilovDGetPixelMirrorOmp(matrix, horizontal_band - 1, vertical_band - 1, width, height);
       sum += kGaussKernel[0][1] * KopilovDGetPixelMirrorOmp(matrix, horizontal_band, vertical_band - 1, width, height);
-      sum += kGaussKernel[0][2] *
-             KopilovDGetPixelMirrorOmp(matrix, horizontal_band + 1, vertical_band - 1, width, height);
+      sum +=
+          kGaussKernel[0][2] * KopilovDGetPixelMirrorOmp(matrix, horizontal_band + 1, vertical_band - 1, width, height);
 
       sum += kGaussKernel[1][0] * KopilovDGetPixelMirrorOmp(matrix, horizontal_band - 1, vertical_band, width, height);
       sum += kGaussKernel[1][1] * KopilovDGetPixelMirrorOmp(matrix, horizontal_band, vertical_band, width, height);
       sum += kGaussKernel[1][2] * KopilovDGetPixelMirrorOmp(matrix, horizontal_band + 1, vertical_band, width, height);
 
-      sum += kGaussKernel[2][0] *
-             KopilovDGetPixelMirrorOmp(matrix, horizontal_band - 1, vertical_band + 1, width, height);
+      sum +=
+          kGaussKernel[2][0] * KopilovDGetPixelMirrorOmp(matrix, horizontal_band - 1, vertical_band + 1, width, height);
       sum += kGaussKernel[2][1] * KopilovDGetPixelMirrorOmp(matrix, horizontal_band, vertical_band + 1, width, height);
-      sum += kGaussKernel[2][2] *
-             KopilovDGetPixelMirrorOmp(matrix, horizontal_band + 1, vertical_band + 1, width, height);
+      sum +=
+          kGaussKernel[2][2] * KopilovDGetPixelMirrorOmp(matrix, horizontal_band + 1, vertical_band + 1, width, height);
 
       result[(vertical_band * width) + horizontal_band] = static_cast<uint8_t>(sum / kDivConst);
     }
