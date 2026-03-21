@@ -25,20 +25,21 @@ class ZyazevaSMatrixMultCannonAlgOMP : public BaseTask {
   bool PostProcessingImpl() override;
 
   static bool IsPerfectSquare(int x);
-  static int GetBlockSize(int n);
-  static void CopyBlock(const std::vector<double> &matrix, std::vector<double> &block, int start, int root,
-                        int block_sz);
-  static void ShiftRow(std::vector<double> &matrix, int root, int row, int shift);
-  static void ShiftColumn(std::vector<double> &matrix, int root, int col, int shift);
-  static void InitializeShift(std::vector<double> &matrix, int root, int grid_size, int block_sz, bool is_row_shift);
-  static void ShiftBlocksLeft(std::vector<double> &matrix, int root, int block_sz);
-  static void ShiftBlocksUp(std::vector<double> &matrix, int root, int block_sz);
-
-  int sz_;
-  std::vector<double> matrix_a_;
-  std::vector<double> matrix_b_;
-  std::vector<double> matrix_c_;
-  int block_sz_;
+  static void MultiplyBlocks(const std::vector<double> &a, const std::vector<double> &b, std::vector<double> &c,
+                             int block_size);
+  static void RegularMultiplication(const std::vector<double> &m1, const std::vector<double> &m2,
+                                    std::vector<double> &res, int sz);
+  static void InitializeBlocks(const std::vector<double> &m1, const std::vector<double> &m2,
+                               std::vector<std::vector<double>> &blocks_a, std::vector<std::vector<double>> &blocks_b,
+                               int grid_size, int block_size, size_t grid_size_t, size_t block_size_t, size_t sz_t);
+  static void AlignBlocks(const std::vector<std::vector<double>> &blocks_a,
+                          const std::vector<std::vector<double>> &blocks_b, std::vector<std::vector<double>> &aligned_a,
+                          std::vector<std::vector<double>> &aligned_b, int grid_size, size_t grid_size_t);
+  static void CannonStep(std::vector<std::vector<double>> &aligned_a, std::vector<std::vector<double>> &aligned_b,
+                         std::vector<std::vector<double>> &blocks_c, int grid_size, int block_size, size_t grid_size_t,
+                         int step);
+  static void AssembleResult(const std::vector<std::vector<double>> &blocks_c, std::vector<double> &res_m,
+                             int grid_size, int block_size, size_t sz_t, size_t grid_size_t, size_t block_size_t);
 };
 
 }  // namespace zyazeva_s_matrix_mult_cannon_alg
