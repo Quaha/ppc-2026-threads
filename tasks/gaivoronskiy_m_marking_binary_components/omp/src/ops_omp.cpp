@@ -128,8 +128,8 @@ bool GaivoronskiyMMarkingBinaryComponentsOMP::RunImpl() {
                                              std::vector<int>(static_cast<std::size_t>(cells), 0));
   std::vector<int> labels_used(static_cast<std::size_t>(num_threads), 0);
 
-#pragma omp parallel num_threads(num_threads) default(none) shared(input, local_planes, labels_used, row_starts, rows, \
-                                                                     cols, num_threads)
+#pragma omp parallel num_threads(num_threads) default(none) \
+    shared(input, local_planes, labels_used, row_starts, rows, cols, num_threads)
   {
     const int tid = omp_get_thread_num();
     const int r_begin = row_starts[static_cast<std::size_t>(tid)];

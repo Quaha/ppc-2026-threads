@@ -78,11 +78,10 @@ const std::array<TestType, 5> kTestParam = {
     std::make_tuple(0, "single_L_component"), std::make_tuple(1, "four_separate_pixels"),
     std::make_tuple(2, "all_background"), std::make_tuple(3, "all_objects"), std::make_tuple(4, "two_horizontal_bars")};
 
-const auto kTestTasksList = std::tuple_cat(
-    ppc::util::AddFuncTask<GaivoronskiyMMarkingBinaryComponentsSEQ, InType>(kTestParam,
-                                                                            PPC_SETTINGS_gaivoronskiy_m_marking_binary_components),
-    ppc::util::AddFuncTask<GaivoronskiyMMarkingBinaryComponentsOMP, InType>(kTestParam,
-                                                                           PPC_SETTINGS_gaivoronskiy_m_marking_binary_components));
+const auto kTestTasksList = std::tuple_cat(ppc::util::AddFuncTask<GaivoronskiyMMarkingBinaryComponentsSEQ, InType>(
+                                               kTestParam, PPC_SETTINGS_gaivoronskiy_m_marking_binary_components),
+                                           ppc::util::AddFuncTask<GaivoronskiyMMarkingBinaryComponentsOMP, InType>(
+                                               kTestParam, PPC_SETTINGS_gaivoronskiy_m_marking_binary_components));
 
 const auto kGtestValues = ppc::util::ExpandToValues(kTestTasksList);
 

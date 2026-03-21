@@ -45,9 +45,9 @@ TEST_P(GaivoronskiyMMarkingPerfTests, RunPerfModes) {
 
 namespace {
 
-const auto kAllPerfTasks =
-    ppc::util::MakeAllPerfTasks<InType, GaivoronskiyMMarkingBinaryComponentsSEQ,
-                                GaivoronskiyMMarkingBinaryComponentsOMP>(PPC_SETTINGS_gaivoronskiy_m_marking_binary_components);
+const auto kAllPerfTasks = ppc::util::MakeAllPerfTasks<InType, GaivoronskiyMMarkingBinaryComponentsSEQ,
+                                                       GaivoronskiyMMarkingBinaryComponentsOMP>(
+    PPC_SETTINGS_gaivoronskiy_m_marking_binary_components);
 
 const auto kGtestValues = ppc::util::TupleToGTestValues(kAllPerfTasks);
 
