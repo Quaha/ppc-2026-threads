@@ -32,9 +32,7 @@ class FrolovaSRadixSortDoubleRunFuncTests : public ppc::util::BaseRunFuncTests<I
     std::string input_path = ppc::util::GetAbsoluteTaskPath(PPC_ID_frolova_s_radix_sort_double, param + ".txt");
 
     std::ifstream file(input_path);
-    if (!file.is_open()) {
-      return;
-    }
+    ASSERT_TRUE(file.is_open()) << "Failed to open test data file: " << input_path;
 
     size_t vect_sz = 0;
     file >> vect_sz;
@@ -71,8 +69,10 @@ const std::array<TestType, 10> kTestParam = {"test1", "test2", "test3", "test4",
                                              "test6", "test7", "test8", "test9", "test10"};
 
 const auto kTestTasksList = std::tuple_cat(
-    ppc::util::AddFuncTask<FrolovaSRadixSortDoubleSEQ, InType>(kTestParam, PPC_SETTINGS_example_threads),
-    ppc::util::AddFuncTask<FrolovaSRadixSortDoubleOMP, InType>(kTestParam, PPC_SETTINGS_example_threads));
+    ppc::util::AddFuncTask<FrolovaSRadixSortDoubleSEQ, InType>(
+        kTestParam, PPC_SETTINGS_frolova_s_radix_sort_double),
+    ppc::util::AddFuncTask<FrolovaSRadixSortDoubleOMP, InType>(
+        kTestParam, PPC_SETTINGS_frolova_s_radix_sort_double));
 
 const auto kGtestValues = ppc::util::ExpandToValues(kTestTasksList);
 
